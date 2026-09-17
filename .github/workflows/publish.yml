@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: npm-publish
@@ -47,15 +48,9 @@ jobs:
 
       - name: Publish @testable-ui/core
         run: pnpm --filter @testable-ui/core publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @testable-ui/runtime
         run: pnpm --filter @testable-ui/runtime publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish @testable-ui/vite
         run: pnpm --filter @testable-ui/vite publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
