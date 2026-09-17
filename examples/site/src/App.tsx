@@ -28,7 +28,7 @@ const HERO_IDS = [
   'checkout-form-place-order-button-3c2bb2c2dce9',
 ];
 
-const REPO_URL = 'https://github.com/testable-ui/testable-ui';
+const REPO_URL = 'https://github.com/aleo-it/testable-ui';
 
 export function App() {
   return (
