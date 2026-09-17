@@ -41,6 +41,9 @@ jobs:
       - name: Build @testable-ui/core
         run: pnpm --filter @testable-ui/core build
 
+      - name: Build @testable-ui/vite
+        run: pnpm --filter @testable-ui/vite build
+
       - name: Run site test suite
         run: pnpm vitest run examples/site
 
