@@ -62,6 +62,17 @@ describe('useTestId', () => {
     expect(second).toBe(first);
   });
 
+  it('updates the id when the supplied row key changes', () => {
+    function Row({ k }: { k: number }) {
+      return <div data-testid={useTestId('order-row', { key: k })} />;
+    }
+    const { rerender, getByTestId } = render(<Row k={1} />);
+    expect(getByTestId('order-row-1')).toBeTruthy();
+
+    rerender(<Row k={2} />);
+    expect(getByTestId('order-row-2')).toBeTruthy();
+  });
+
   it('is SSR-safe: uses useId and never references window or document', () => {
     const source = readFileSync(resolve(process.cwd(), 'packages/runtime/src/index.ts'), 'utf8');
     expect(source).toContain('useId');

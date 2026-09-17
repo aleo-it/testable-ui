@@ -46,9 +46,9 @@ export function sanitizeSuffix(input: string): string {
  *   stable across renders, unique per component instance and hydration-safe,
  *   so uniqueness is guaranteed with zero API friction.
  *
- * The result is memoized per `baseId` in a `useRef` map: repeated calls inside
- * the same component render return the same string, and one component may call
- * `useTestId` with several different base ids while each stays stable.
+ * The result is memoized per base id and suffix input in a `useRef` map:
+ * repeated calls inside the same component render return the same string, while
+ * a changed row key produces a corresponding changed id.
  *
  * Pure client-side hook: no DOM access, no effects, no timers. SSR-safe.
  */
@@ -59,17 +59,17 @@ export function useTestId(baseId: string, options?: UseTestIdOptions): string {
     memo.current = new Map();
   }
 
-  const cached = memo.current.get(baseId);
+  const suffixSource = options?.key !== undefined ? String(options.key) : fallbackId;
+  const cacheKey = `${baseId}\u0000${suffixSource}`;
+  const cached = memo.current.get(cacheKey);
   if (cached !== undefined) {
     return cached;
   }
 
   const suffix =
-    options?.key !== undefined
-      ? sanitizeSuffix(String(options.key))
-      : sanitizeSuffix(fallbackId);
+    options?.key !== undefined ? sanitizeSuffix(suffixSource) : sanitizeSuffix(fallbackId);
   const id = `${baseId}-${suffix}`;
-  memo.current.set(baseId, id);
+  memo.current.set(cacheKey, id);
   return id;
 }
 
