@@ -1,0 +1,49 @@
+{
+  "name": "@testable-ui/vite",
+  "version": "0.1.0",
+  "description": "Vite adapter for automatic, deterministic, semantic data-testid generation",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "testing",
+    "data-testid",
+    "test-id",
+    "vite-plugin",
+    "e2e",
+    "testing-library",
+    "playwright"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@swc/core": "^1.10.0",
+    "@testable-ui/core": "workspace:^"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0 || ^6.0.0 || ^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.1",
+    "typescript": "^5.8.0",
+    "vite": "^6.0.0"
+  }
+}

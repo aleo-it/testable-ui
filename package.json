@@ -1,0 +1,18 @@
+{
+  "name": "testable-ui",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Automatic, unique, semantic data-testid generation for React — build-time injection + runtime uniquification + typed registry",
+  "license": "MIT",
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "pnpm -r --filter './packages/*' typecheck"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "packageManager": "pnpm@11.13.1"
+}
