@@ -1,31 +1,26 @@
-name: Publish packages to npm
+name: Release packages to npm
 
 on:
-  release:
-    types: [published]
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Release tag to publish
-        required: true
-        type: string
+  push:
+    branches: [main]
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
   id-token: write
 
 concurrency:
-  group: npm-publish
+  group: release
   cancel-in-progress: false
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out release
+      - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag || github.event.release.tag_name }}
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -37,6 +32,9 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: pnpm
 
+      - name: Use npm with trusted publishing support
+        run: npm install --global npm@latest
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -46,11 +44,12 @@ jobs:
       - name: Run tests
         run: pnpm test
 
-      - name: Publish @testable-ui/core
-        run: pnpm --filter @testable-ui/core publish --access public --no-git-checks
-
-      - name: Publish @testable-ui/runtime
-        run: pnpm --filter @testable-ui/runtime publish --access public --no-git-checks
-
-      - name: Publish @testable-ui/vite
-        run: pnpm --filter @testable-ui/vite publish --access public --no-git-checks
+      - name: Create release PR or publish packages
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          publish: pnpm changeset publish
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
