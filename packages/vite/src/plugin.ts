@@ -1,9 +1,8 @@
 /**
  * Vite plugin: automatic, deterministic, semantic `data-testid` generation.
  *
- * Dev mode: no automatic registry write by default. To regenerate the
- * registry during development, import `writeRegistryFile` from
- * `@testable-ui/vite` and call it with your manifest, or run a build.
+ * The registry is refreshed after every matching transform in development and
+ * finalized again when a production bundle closes.
  *
  * `includeInProduction: false` in a production build skips injection AND
  * registry emission entirely (documented simplification).

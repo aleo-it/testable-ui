@@ -18,7 +18,7 @@ Fully-dynamic ids (UUIDs, hashes of everything) fail the purpose: tests must be
 write-able *before* the UI exists, so ids must be **predictable from source**.
 `testable-ui` derives ids entirely from the source you already wrote:
 
-- **Semantic** — `aria-labelledby` wins, then `aria-label`, then `label`, then
+- **Semantic** — static `aria-labelledby` text wins, then `aria-label`, then `label`, then
   `title`, then element text, then `inputType`, then `placeholder`, then handler
   name — gated by HTML-AAM role (text only on name-from-content elements,
   placeholder only on form controls).
@@ -107,19 +107,20 @@ import { TestIdOverlay } from '@testable-ui/runtime';
 |---|---|---|
 | `attributeName` | `data-testid` | Which attribute to inject |
 | `registryFile` | `test-ids.generated.ts` | Written at build (`closeBundle`) |
-| `include` | `\.(t|j)sx$` | File filter |
+| `include` | `\.(m?[jt]sx?)$` | File filter |
 | `exclude` | `node_modules` | File filter |
 | `maxIdLength` | `48` | Overflowing ids truncate with `~` |
 | `algorithmVersion` | `1` | Future-proofing |
 | `environment` | `development` | `production` + `includeInProduction: false` skips injection |
 | `includeInProduction` | `true` | See `environment` |
+| `strict` | `false` | Fail the build when a matching file cannot be transformed |
 
 ## Known limitations (v1)
 
 - A root `<div>` wrapping the app aggregates all descendant text into its id —
   names such containers explicitly or use non-text elements at the top.
-- Dev mode does not auto-write the registry on every change; build to
-  regenerate (`writeRegistryFile` is exported for manual use).
+- The registry is refreshed as matching modules transform. Import the emitted
+  file from test code after your app build has run.
 - Elements in `.map()` need `useTestId` (runtime) for row-unique ids.
 - Overlong ids truncate (48-char cap) instead of staying verbatim.
 
@@ -127,7 +128,7 @@ import { TestIdOverlay } from '@testable-ui/runtime';
 
 ```sh
 pnpm install
-pnpm test          # vitest, all packages (63 tests)
+pnpm test          # vitest, all packages (100 tests)
 pnpm build         # tsc for all packages
 pnpm --filter @testable-ui/playground dev   # interactive demo
 pnpm --filter @testable-ui/playground verify  # integration gate against real vite build
