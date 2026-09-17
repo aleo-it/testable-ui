@@ -137,7 +137,8 @@ function attrStringValue(attrs: readonly Attr[], name: string): string | undefin
 /** `type` attribute when informative (email/password/...), else undefined. */
 function inputTypeOf(attrs: readonly Attr[]): string | undefined {
   const type = attrStringValue(attrs, 'type');
-  if (type && INFORMATIVE_INPUT_TYPES.has(type)) return type;
+  const normalized = type?.toLowerCase();
+  if (normalized && INFORMATIVE_INPUT_TYPES.has(normalized)) return normalized;
   return undefined;
 }
 
@@ -225,10 +226,18 @@ function processElement(element: ElementNode, ctx: WalkContext): void {
   }
 
   const idAttr = attrStringValue(attrs, 'id');
+  const ariaLabelledby = attrStringValue(attrs, 'aria-labelledby');
+  const labelledByTexts = ariaLabelledby
+    ?.trim()
+    .split(/\s+/)
+    .map((id) => ctx.labelMap.get(id));
+  const resolvedAriaLabelledby = labelledByTexts?.every((text): text is string => Boolean(text))
+    ? labelledByTexts.join(' ')
+    : undefined;
   const signals: Omit<ElementSignals, 'fileName'> = {
     componentName,
     elementType,
-    ariaLabelledby: attrStringValue(attrs, 'aria-labelledby'),
+    ariaLabelledby: resolvedAriaLabelledby,
     ariaLabel: attrStringValue(attrs, 'aria-label'),
     title: attrStringValue(attrs, 'title'),
     placeholder: attrStringValue(attrs, 'placeholder'),
@@ -288,6 +297,12 @@ function visitJSXElement(element: ElementNode, ctx: WalkContext): void {
         const text = elementText(labelEl.children);
         if (text) nextLabelMap.set(htmlFor, text);
       }
+    }
+    if (child.type === 'JSXElement') {
+      const referenced = child as unknown as ElementNode;
+      const id = attrStringValue(referenced.openingElement.attributes, 'id');
+      const text = elementText(referenced.children);
+      if (id && text) nextLabelMap.set(id, text);
     }
   }
   ctx.labelMap = nextLabelMap;
