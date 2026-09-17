@@ -238,7 +238,8 @@ describe('testableUiVite plugin', () => {
   });
 
   it('derives stable ids from a Vite module id with query parameters', () => {
-    const plugin = testableUiVite();
+    const dir = mkdtempSync(join(tmpdir(), 'testable-ui-'));
+    const plugin = testableUiVite({ registryFile: join(dir, 'test-ids.generated.ts') });
     const id = `${join(process.cwd(), 'src', 'CheckoutForm.tsx')}?v=123`;
     const result = plugin.transform?.('const CheckoutForm = () => <button>Submit</button>;', id);
     expect(result).not.toBeNull();

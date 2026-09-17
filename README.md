@@ -128,7 +128,7 @@ import { TestIdOverlay } from '@testable-ui/runtime';
 
 ```sh
 pnpm install
-pnpm test          # vitest, all packages (100 tests)
+pnpm test          # vitest, all packages (101 tests)
 pnpm build         # tsc for all packages
 pnpm --filter @testable-ui/playground dev   # interactive demo
 pnpm --filter @testable-ui/playground verify  # integration gate against real vite build
