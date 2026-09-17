@@ -205,7 +205,6 @@ describe('testableUiVite plugin', () => {
     expect(typeof plugin.transform).toBe('function');
     expect(typeof plugin.buildStart).toBe('function');
     expect(typeof plugin.closeBundle).toBe('function');
-    expect(typeof plugin.configureServer).toBe('function');
   });
 
   it('skips injection entirely in production when includeInProduction is false', () => {
@@ -248,6 +247,21 @@ describe('testableUiVite plugin', () => {
 
     const content = readFileSync(registryFile, 'utf8');
     expect(content).toContain(`checkout-form-submit-button-${pathSuffix('src/CheckoutForm.tsx')}`);
+  });
+
+  it('updates the registry as source files are transformed', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'testable-ui-'));
+    const registryFile = join(dir, 'test-ids.generated.ts');
+    const plugin = testableUiVite({ registryFile });
+    const id = join(process.cwd(), 'src', 'CheckoutForm.tsx');
+
+    plugin.buildStart?.();
+    plugin.transform?.('const CheckoutForm = () => <button>Submit</button>;', id);
+    plugin.transform?.('const CheckoutForm = () => <button>Cancel</button>;', id);
+
+    const content = readFileSync(registryFile, 'utf8');
+    expect(content).toContain(`checkout-form-cancel-button-${pathSuffix('src/CheckoutForm.tsx')}`);
+    expect(content).not.toContain(`checkout-form-submit-button-${pathSuffix('src/CheckoutForm.tsx')}`);
   });
 
   it('resets accumulated manifest state on buildStart', () => {

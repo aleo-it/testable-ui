@@ -11,7 +11,7 @@
 import { relative, resolve } from 'node:path';
 import type { Plugin } from 'vite';
 
-import type { TestIdManifest } from '@testable-ui/core';
+import type { TestIdEntry, TestIdManifest } from '@testable-ui/core';
 
 import { writeRegistryFile } from './registry.js';
 import { transformSource } from './transform.js';
@@ -28,10 +28,27 @@ function cleanModuleId(id: string): string {
   return id.replace(/[?#].*$/, '');
 }
 
+/** Avoid stateful `/g` or `/y` user regexes leaking `lastIndex` across files. */
+function matches(regex: RegExp, value: string): boolean {
+  regex.lastIndex = 0;
+  const result = regex.test(value);
+  regex.lastIndex = 0;
+  return result;
+}
+
 export function testableUiVite(options: TestableUiViteOptions = {}): Plugin {
   const resolved = resolveOptions(options);
-  let manifest: TestIdManifest = { algorithmVersion: resolved.algorithmVersion, entries: [] };
+  const entriesByFile = new Map<string, TestIdEntry[]>();
   let root = process.cwd();
+
+  const currentManifest = (): TestIdManifest => ({
+    algorithmVersion: resolved.algorithmVersion,
+    entries: [...entriesByFile.values()].flat(),
+  });
+
+  const writeRegistry = (): void => {
+    writeRegistryFile(currentManifest(), resolve(root, resolved.registryFile));
+  };
 
   const skipInjection = (): boolean =>
     resolved.environment === 'production' && !resolved.includeInProduction;
@@ -47,13 +64,13 @@ export function testableUiVite(options: TestableUiViteOptions = {}): Plugin {
     // Reset accumulated manifest state on every build start so rebuilds
     // (dev restart or multiple builds in one process) never go stale.
     buildStart() {
-      manifest = { algorithmVersion: resolved.algorithmVersion, entries: [] };
+      entriesByFile.clear();
     },
 
     transform(code, id) {
       if (skipInjection()) return null;
       const fileId = cleanModuleId(id);
-      if (!resolved.include.test(fileId) || resolved.exclude.test(fileId)) return null;
+      if (!matches(resolved.include, fileId) || matches(resolved.exclude, fileId)) return null;
 
       const relativePath = toPosix(relative(root, fileId));
       let result;
@@ -72,17 +89,15 @@ export function testableUiVite(options: TestableUiViteOptions = {}): Plugin {
         else this.warn(message);
         return null;
       }
-      manifest.entries.push(...result.entries);
+      entriesByFile.set(relativePath, result.entries);
+      writeRegistry();
       return { code: result.code, map: null };
     },
 
     closeBundle() {
       if (skipInjection()) return;
-      writeRegistryFile(manifest, resolve(root, resolved.registryFile));
+      writeRegistry();
     },
 
-    configureServer() {
-      // Dev mode: no automatic registry write by default. See module comment.
-    },
   };
 }
