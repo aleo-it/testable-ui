@@ -237,6 +237,16 @@ describe('testableUiVite plugin', () => {
     expect(result).toBeNull();
   });
 
+  it('derives stable ids from a Vite module id with query parameters', () => {
+    const plugin = testableUiVite();
+    const id = `${join(process.cwd(), 'src', 'CheckoutForm.tsx')}?v=123`;
+    const result = plugin.transform?.('const CheckoutForm = () => <button>Submit</button>;', id);
+    expect(result).not.toBeNull();
+    expect(typeof result === 'string' ? result : result?.code).toContain(
+      `checkout-form-submit-button-${pathSuffix('src/CheckoutForm.tsx')}`,
+    );
+  });
+
   it('warns when a source file cannot be transformed', () => {
     const warn = vi.fn();
     const plugin = testableUiVite();
