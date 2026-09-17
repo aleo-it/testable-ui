@@ -160,6 +160,11 @@ export class TestableUiVisitor extends Visitor {
           if (text) nextLabelMap.set(htmlFor, text);
         }
       }
+      if (child.type === 'JSXElement') {
+        const id = attrStringValue(child.opening.attributes, 'id');
+        const text = elementText(child.children);
+        if (id && text) nextLabelMap.set(id, text);
+      }
     }
     this.labelMap = nextLabelMap;
 
@@ -186,7 +191,7 @@ export class TestableUiVisitor extends Visitor {
       componentName,
       elementType,
       fileName: this.fileName,
-      ariaLabelledby: attrStringValue(attrs, 'aria-labelledby'),
+      ariaLabelledby: this.resolveAriaLabelledby(attrStringValue(attrs, 'aria-labelledby')),
       ariaLabel: attrStringValue(attrs, 'aria-label'),
       title: attrStringValue(attrs, 'title'),
       placeholder: attrStringValue(attrs, 'placeholder'),
@@ -198,6 +203,13 @@ export class TestableUiVisitor extends Visitor {
 
     const base = nameElement(signals, this.namingOptions).id;
     this.pendingElements.push({ element, base, componentName });
+  }
+
+  /** Resolve a static `aria-labelledby` reference only when every target is known. */
+  private resolveAriaLabelledby(value: string | undefined): string | undefined {
+    if (!value) return undefined;
+    const texts = value.trim().split(/\s+/).map((id) => this.labelMap.get(id));
+    return texts.every((text): text is string => Boolean(text)) ? texts.join(' ') : undefined;
   }
 
   /**

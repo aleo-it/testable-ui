@@ -26,6 +26,7 @@ export interface TransformSourceOptions {
 
 export interface TransformSourceResult {
   code: string;
+  map: string;
   entries: TestIdEntry[];
 }
 
@@ -41,6 +42,10 @@ function isTsx(filename: string): boolean {
 export function transformSource(code: string, options: TransformSourceOptions): TransformSourceResult {
   const module = parseSync(code, { syntax: 'typescript', tsx: isTsx(options.filename) });
   const visitor = new TestableUiVisitor(options);
-  const output = printSync(visitor.visitProgram(module), {});
-  return { code: output.code, entries: visitor.entries };
+  const output = printSync(visitor.visitProgram(module), {
+    filename: options.filename,
+    sourceFileName: options.relativePath,
+    sourceMaps: true,
+  });
+  return { code: output.code, map: output.map ?? '', entries: visitor.entries };
 }

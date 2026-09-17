@@ -91,7 +91,7 @@ export function testableUiVite(options: TestableUiViteOptions = {}): Plugin {
       }
       entriesByFile.set(relativePath, result.entries);
       writeRegistry();
-      return { code: result.code, map: null };
+      return { code: result.code, map: result.map };
     },
 
     closeBundle() {

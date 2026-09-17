@@ -50,9 +50,22 @@ describe('transformSource: signal extraction + id computation', () => {
     expect(code).not.toContain('type-here');
   });
 
+  it('uses static aria-labelledby text rather than the referenced DOM id', () => {
+    const code = run(
+      'const CheckoutForm = () => <div><span id="email-label">Email address</span><input aria-labelledby="email-label" /></div>;',
+    );
+    expect(code).toContain(`data-testid="checkout-form-email-address-input-${SUFFIX}"`);
+    expect(code).not.toContain('email-label-input');
+  });
+
   it('uses inputType when no stronger signal exists', () => {
     const code = run('const LoginForm = () => <input type="password" />;', 'src/LoginForm.tsx');
     expect(code).toContain(`data-testid="login-form-password-input-${pathSuffix('src/LoginForm.tsx')}"`);
+  });
+
+  it('normalizes case-insensitive HTML input types', () => {
+    const code = run('const LoginForm = () => <input type="EMAIL" />;', 'src/LoginForm.tsx');
+    expect(code).toContain(`data-testid="login-form-email-input-${pathSuffix('src/LoginForm.tsx')}"`);
   });
 
   it('ignores non-informative input types', () => {
@@ -98,6 +111,17 @@ describe('transformSource: signal extraction + id computation', () => {
       filename: `${REL}?v=123`,
     }).code;
     expect(code).toContain(`data-testid="checkout-form-submit-button-${SUFFIX}"`);
+  });
+
+  it('returns an SWC source map for Vite to compose', () => {
+    const result = transformSource('const CheckoutForm = () => <button>Submit</button>;', {
+      attributeName: 'data-testid',
+      algorithmVersion: 1,
+      maxIdLength: 48,
+      relativePath: REL,
+      filename: REL,
+    });
+    expect(result.map).toContain('CheckoutForm.tsx');
   });
 });
 

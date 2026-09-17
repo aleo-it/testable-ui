@@ -75,7 +75,8 @@ export function attrStringValue(
 /** `type` attribute when informative (email/password/...), else undefined. */
 export function inputTypeOf(attrs: readonly JSXAttributeOrSpread[]): string | undefined {
   const type = attrStringValue(attrs, 'type');
-  if (type && INFORMATIVE_INPUT_TYPES.has(type)) return type;
+  const normalized = type?.toLowerCase();
+  if (normalized && INFORMATIVE_INPUT_TYPES.has(normalized)) return normalized;
   return undefined;
 }
 
