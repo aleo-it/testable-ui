@@ -31,7 +31,7 @@ export interface TransformSourceResult {
 
 /** True for `.tsx`/`.jsx`/`.mtsx`/`.mjsx`/`.ctsx`/`.cjsx` files. */
 function isTsx(filename: string): boolean {
-  return /\.(?:[cm]?[jt]sx)$/.test(filename);
+  return /\.(?:[cm]?[jt]sx)$/.test(filename.replace(/[?#].*$/, ''));
 }
 
 /**

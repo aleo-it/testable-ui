@@ -23,6 +23,11 @@ function toPosix(p: string): string {
   return p.split('\\').join('/');
 }
 
+/** Vite module ids may carry query/hash suffixes that are not part of the file path. */
+function cleanModuleId(id: string): string {
+  return id.replace(/[?#].*$/, '');
+}
+
 export function testableUiVite(options: TestableUiViteOptions = {}): Plugin {
   const resolved = resolveOptions(options);
   let manifest: TestIdManifest = { algorithmVersion: resolved.algorithmVersion, entries: [] };
@@ -47,9 +52,10 @@ export function testableUiVite(options: TestableUiViteOptions = {}): Plugin {
 
     transform(code, id) {
       if (skipInjection()) return null;
-      if (!resolved.include.test(id) || resolved.exclude.test(id)) return null;
+      const fileId = cleanModuleId(id);
+      if (!resolved.include.test(fileId) || resolved.exclude.test(fileId)) return null;
 
-      const relativePath = toPosix(relative(root, id));
+      const relativePath = toPosix(relative(root, fileId));
       let result;
       try {
         result = transformSource(code, {
@@ -57,10 +63,13 @@ export function testableUiVite(options: TestableUiViteOptions = {}): Plugin {
           algorithmVersion: resolved.algorithmVersion,
           maxIdLength: resolved.maxIdLength,
           relativePath,
-          filename: id,
+          filename: fileId,
         });
-      } catch {
-        // Unparseable by SWC (e.g. non-TS syntax) — let Vite handle the file.
+      } catch (error) {
+        const detail = error instanceof Error ? error.message : String(error);
+        const message = `testable-ui: failed to transform ${relativePath}: ${detail}`;
+        if (resolved.strict) this.error(message);
+        else this.warn(message);
         return null;
       }
       manifest.entries.push(...result.entries);

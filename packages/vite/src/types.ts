@@ -22,6 +22,8 @@ export interface TestableUiViteOptions {
   include?: RegExp;
   /** Files to skip. Default `/node_modules/`. */
   exclude?: RegExp;
+  /** Fail the build instead of warning when a matching source file cannot be transformed. */
+  strict?: boolean;
 }
 
 export interface ResolvedOptions {
@@ -33,6 +35,7 @@ export interface ResolvedOptions {
   registryFile: string;
   include: RegExp;
   exclude: RegExp;
+  strict: boolean;
 }
 
 /** Apply defaults to the user-supplied options. */
@@ -46,5 +49,6 @@ export function resolveOptions(options: TestableUiViteOptions): ResolvedOptions 
     registryFile: options.registryFile ?? 'test-ids.generated.ts',
     include: options.include ?? /\.(m?[jt]sx?)$/,
     exclude: options.exclude ?? /node_modules/,
+    strict: options.strict ?? false,
   };
 }

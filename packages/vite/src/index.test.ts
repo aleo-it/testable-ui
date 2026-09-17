@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { pathSuffix } from '@testable-ui/core';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { testableUiVite } from './plugin.js';
 import { writeRegistryFile } from './registry.js';
@@ -87,6 +87,17 @@ describe('transformSource: signal extraction + id computation', () => {
     }).code;
     expect(code).toContain(`data-test-id="checkout-form-submit-button-${SUFFIX}"`);
     expect(code).not.toContain('data-testid');
+  });
+
+  it('normalizes Vite query parameters before deriving the path suffix', () => {
+    const code = transformSource('const CheckoutForm = () => <button>Submit</button>;', {
+      attributeName: 'data-testid',
+      algorithmVersion: 1,
+      maxIdLength: 48,
+      relativePath: REL,
+      filename: `${REL}?v=123`,
+    }).code;
+    expect(code).toContain(`data-testid="checkout-form-submit-button-${SUFFIX}"`);
   });
 });
 
@@ -201,6 +212,27 @@ describe('testableUiVite plugin', () => {
     const plugin = testableUiVite({ environment: 'production', includeInProduction: false });
     const result = plugin.transform?.('const A = () => <button>Hi</button>;', '/root/src/A.tsx');
     expect(result).toBeNull();
+  });
+
+  it('warns when a source file cannot be transformed', () => {
+    const warn = vi.fn();
+    const plugin = testableUiVite();
+    const result = plugin.transform?.call(
+      { warn } as never,
+      'const = invalid;',
+      join(process.cwd(), 'src', 'Broken.tsx'),
+    );
+    expect(result).toBeNull();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Broken.tsx'));
+  });
+
+  it('fails in strict mode when a source file cannot be transformed', () => {
+    const plugin = testableUiVite({ strict: true });
+    expect(() => plugin.transform?.call(
+      { error: (message: string) => { throw new Error(message); } } as never,
+      'const = invalid;',
+      join(process.cwd(), 'src', 'Broken.tsx'),
+    )).toThrow('Broken.tsx');
   });
 
   it('accumulates entries across transforms and writes the registry on closeBundle', () => {
