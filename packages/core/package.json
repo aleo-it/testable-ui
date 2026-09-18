@@ -3,6 +3,15 @@
   "version": "0.1.1",
   "description": "Deterministic semantic test-id naming engine + manifest/registry generation, framework-agnostic",
   "license": "MIT",
+  "homepage": "https://github.com/aleo-it/testable-ui#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleo-it/testable-ui.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/aleo-it/testable-ui/issues"
+  },
   "type": "module",
   "sideEffects": false,
   "keywords": [
