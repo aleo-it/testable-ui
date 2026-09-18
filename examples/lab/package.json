@@ -1,0 +1,21 @@
+{
+  "name": "@testable-ui/lab",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lab": "tsx src/run.ts",
+    "lab:agent": "tsx src/run-agent.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@testable-ui/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
+  }
+}

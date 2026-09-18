@@ -1,0 +1,45 @@
+<html><head><title>testable-ui KPI lab</title></head><body><pre>{
+  "suite": "testable-ui/kpi-lab@1",
+  "generatedAt": "2026-09-18T10:21:44.002Z",
+  "taskCount": 12,
+  "modelNodeCount": 24,
+  "verdict": {
+    "passed": true,
+    "reason": "with-arm must reach >=90% success-at-first, strictly beat without-arm, and never select the wrong target."
+  },
+  "arms": {
+    "with": {
+      "arm": "with",
+      "successAt1": 12,
+      "successAt1Rate": 1,
+      "ambiguityRate": 0,
+      "wrongTargetRate": 0,
+      "meanAttempts": 1,
+      "medianAttempts": 1,
+      "deterministicPct": 1,
+      "editStablePct": 1,
+      "kpiPassed": 2,
+      "kpiTotal": 2,
+      "kpiPassRate": 1
+    },
+    "without": {
+      "arm": "without",
+      "successAt1": 1,
+      "successAt1Rate": 0.083,
+      "ambiguityRate": 0.917,
+      "wrongTargetRate": 0,
+      "meanAttempts": 3.25,
+      "medianAttempts": 3,
+      "deterministicPct": 1,
+      "editStablePct": 1,
+      "kpiPassed": 2,
+      "kpiTotal": 2,
+      "kpiPassRate": 1
+    }
+  },
+  "deltas": {
+    "successAt1GainPct": 91.7,
+    "ambiguityReductionPct": 91.7,
+    "wrongTargetReductionPct": 0
+  }
+}</pre></body></html>

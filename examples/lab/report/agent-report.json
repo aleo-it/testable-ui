@@ -1,0 +1,24 @@
+{
+  "suite": "testable-ui/kpi-lab/agent@1",
+  "agentCommand": "node src/codex-agent.mjs",
+  "taskCount": 12,
+  "modelNodeCount": 24,
+  "arms": {
+    "with": {
+      "arm": "with",
+      "successAt1": 12,
+      "successAt1Rate": 1,
+      "ambiguityRate": 0,
+      "wrongTargetRate": 0,
+      "meanAttempts": 1
+    },
+    "without": {
+      "arm": "without",
+      "successAt1": 7,
+      "successAt1Rate": 0.583,
+      "ambiguityRate": 0.333,
+      "wrongTargetRate": 0.083,
+      "meanAttempts": 1.17
+    }
+  }
+}

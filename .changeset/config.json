@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@testable-ui/site", "@testable-ui/playground"]
+  "ignore": ["@testable-ui/site", "@testable-ui/playground", "@testable-ui/lab"]
 }

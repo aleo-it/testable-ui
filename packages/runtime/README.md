@@ -23,12 +23,13 @@ The key-based primary path works with React 18+ (`useId` hook for fallback).
 ## `TestIdOverlay`
 
 Dev-only overlay. Hover to see any element's `data-testid`; `Alt+T` toggles;
-click to copy to clipboard. Portal-based, zero external deps.
+click to copy to clipboard. Portal-based, zero external deps. It is opt-in and
+should be mounted only in development:
 
 ```tsx
 import { TestIdOverlay } from '@testable-ui/runtime';
-// Only render in development — JSDoc marks it with a warning
-<TestIdOverlay />
+// Vite's DEV flag keeps debugging UI out of production.
+{import.meta.env.DEV && <TestIdOverlay />}
 ```
 
 ## Peer dependencies
