@@ -1,6 +1,6 @@
 {
   "name": "@testable-ui/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Deterministic semantic test-id naming engine + manifest/registry generation, framework-agnostic",
   "license": "MIT",
   "type": "module",
