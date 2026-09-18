@@ -1,6 +1,6 @@
 {
   "name": "@testable-ui/vite",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vite adapter for automatic, deterministic, semantic data-testid generation",
   "license": "MIT",
   "type": "module",
